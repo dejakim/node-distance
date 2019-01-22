@@ -15,7 +15,7 @@ static int _utf8_dec(const char *src, int* dst) {
   int len = -1;
   unsigned char *p = (unsigned char*)(src);
   unsigned char c = *(p);
-  while (c != 0) {
+  while (c != 0 && len < (MAX_LEN - 1)) {
     if (c < 128 || c >= 192) {
       dst[++len] = (int)(c & 0x7F);
     } else {
@@ -47,7 +47,7 @@ NAN_METHOD(levenshtein) {
   std::string str1(*v1, v1.length());
 
   // convert to UTF-8 string
-  int *s0 = D, *s1 = (D + 256);
+  int *s0 = D, *s1 = (D + MAX_LEN);
   int len0 = _utf8_dec(str0.c_str(), s0);
   int len1 = _utf8_dec(str1.c_str(), s1);
 
@@ -58,7 +58,7 @@ NAN_METHOD(levenshtein) {
   }
 
   // Initialize buffers
-  int *d0 = (D + 512), *d1 = (D + 768);
+  int *d0 = (D + MAX_LEN * 2), *d1 = (D + MAX_LEN * 3);
   for (int i = 0; i <= len0; i++) { d0[i] = i; }
   // Calculation
   for (int i = 0; i < len1; i++) {
